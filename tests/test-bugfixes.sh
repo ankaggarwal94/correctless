@@ -539,10 +539,13 @@ test_padded_wc_spec_lines() {
   ADV review >/dev/null 2>&1
 
   # wc shim: real wc output with the count column left-padded the way BSD wc prints it
+  # Resolve the real wc before the shim shadows it (not every system has /usr/bin/wc)
+  local real_wc
+  real_wc="$(command -v wc)"
   mkdir -p "$TEST_DIR/padbin"
-  cat > "$TEST_DIR/padbin/wc" <<'WCSHIM'
+  cat > "$TEST_DIR/padbin/wc" <<WCSHIM
 #!/usr/bin/env bash
-/usr/bin/wc "$@" | awk '{ $1 = sprintf("%8s", $1); print }'
+"$real_wc" "\$@" | awk '{ \$1 = sprintf("%8s", \$1); print }'
 WCSHIM
   chmod +x "$TEST_DIR/padbin/wc"
 
